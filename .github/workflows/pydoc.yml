@@ -1,0 +1,36 @@
+name: Generar documentació amb Pydoc
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  pydoc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clona el repositori
+        uses: actions/checkout@v3
+
+      - name: Configura Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Instal·la dependències
+        run: |
+          pip install -r requirements.txt
+
+      - name: Genera documentació amb pydoc
+        run: |
+          mkdir -p docs
+          python -m pydoc -w blog.models
+          python -m pydoc -w blog.views
+          mv blog.models.html docs/models.html
+          mv blog.views.html docs/views.html
+
+      - name: Publica la documentació com a artefacte
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentacio-pydoc
+          path: docs/
